@@ -1,20 +1,21 @@
 //TO DO
-//Convert all String to char[] (done?)
+//Convert all String to char[] (done? needs testing)
 //dtmf audio out
-//
 //SSerial or RADIO_SERIAL conversion
+//RX activity pin to prevent transmitting on a busy channel
+//build ACK and ERROR signals for DTMF commands (800Hz tone?)
 
 // BOARD CHANGES
 //Include AF filter/uModem hardware
 //Include RF filter
 //
 
-#define TX_RXact 2  //Module Pin 1 Low = Squelch open, High = squelch closed
-#define TX_AFout 3  //Module pin 3 Receive audio
-#define TX_ptt 5    //Module pin 5 Low for TX
-#define TX_sleep 6  //Module pin 6 0=sleep
-#define TX_pwr 7    //Module pin 7 ***DO NOT SET TO HIGH, MUST FLOAT FOR HIGH POWER***
-#define TX_AFin 9   //Module pin 18 Audio out from arduino
+#define TX_RXact 42  //Module Pin 1 Low = Squelch open, High = squelch closed
+#define TX_AFout 43  //Module pin 3 Receive audio
+#define TX_ptt 45    //Module pin 5 Low for TX
+#define TX_sleep 46  //Module pin 6 0=sleep
+#define TX_pwr 47    //Module pin 7 ***DO NOT SET TO HIGH, MUST FLOAT FOR HIGH POWER***
+#define TX_AFin 49   //Module pin 18 Audio out from arduino
 #define RADIO_SERIAL Serial
 //#define error_pin 13  //Onboard LED pin
 
@@ -145,6 +146,9 @@ void setFilter() {
     errorFlag = true;
   }    
 }
+
+
+
 
 //---------------------SETUP----------------------//
 
