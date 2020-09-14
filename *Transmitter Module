@@ -1,8 +1,9 @@
 //TO DO
 //Convert all String to char[] (done? needs testing)
+//Build TX() function
 //dtmf audio out
 //SSerial or RADIO_SERIAL conversion
-//RX activity pin to prevent transmitting on a busy channel
+//RX activity pin to prevent transmitting on a busy channel (need to test receiver noise floor in field)
 //build ACK and ERROR signals for DTMF commands (800Hz tone?)
 
 // BOARD CHANGES
