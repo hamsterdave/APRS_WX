@@ -1,15 +1,14 @@
 //TO DO
 //Convert all String to char[] (done? needs testing)
-//Build TX() function
 //dtmf audio out
-//SSerial or RADIO_SERIAL conversion
+//SSerial conversion?
 //RX activity pin to prevent transmitting on a busy channel (need to test receiver noise floor in field)
-//build ACK and ERROR signals for DTMF commands (800Hz tone?)
 
 // BOARD CHANGES
 //Include AF filter/uModem hardware
 //Include RF filter
 //
+
 
 #define TX_RXact 42  //Module Pin 1 Low = Squelch open, High = squelch closed
 #define TX_AFout 43  //Module pin 3 Receive audio
@@ -26,12 +25,12 @@ char TX_sgHead[] = "AT+DMOSETGROUP="; //group set preamble
 char TX_volHead[] = "AT+DMOSETVOLUME="; //volume preamble
 char TX_filHead[] = "AT+DMOSETFILTER="; //audio filter preamble
 
-//---------End all strings in this section with comma----------//
-char TX_bw[] = "0,"; //0 = 12.5khz 1 = 25khz
-char TX_txf[] = "144.3800,"; //TX frequency: Must use 4 digits after dot
-char TX_rxf[] = "144.3800,"; //rx freq: " "
-char TX_txpl[] = "0000,"; //TX CTCSS 0000 = none See programming manual for codes
-char TX_sq[] = "6,"; //Squelch level 0-8: 0 = open
+
+char TX_bw[] = "0"; //0 = 12.5khz 1 = 25khz
+char TX_txf[] = "144.3900"; //TX frequency: Must use 4 digits after dot
+char TX_rxf[] = "144.3900"; //rx freq: " "
+char TX_txpl[] = "0000"; //TX CTCSS 0000 = none See programming manual for codes
+char TX_sq[] = "6"; //Squelch level 0-8: 0 = open
 //------------------------------------------------------------//
 
 char TX_rxpl[] = "0000"; //RX CTCSS
@@ -80,12 +79,14 @@ void txDebug() {
 
 void handShake() {
   serialCount = 0;
-  Serial1.println(TX_shake);
+  RADIO_SERIAL.println("AT+DMOCONNECT");
   delay(100);
-  Serial1.println(TX_shake);
-  while (Serial1.available() > 0) {
+  RADIO_SERIAL.println("AT+DMOCONNECT");  
+  
+  
+  while (RADIO_SERIAL.available() > 0) {
     char incomingChar;
-    incomingChar = Serial1.read();
+    incomingChar = RADIO_SERIAL.read();
     shakeReply[serialCount] = incomingChar;
     serialCount++;
   }
@@ -96,14 +97,18 @@ void handShake() {
  
 //----------------SetGroup---------------//
 
+
+
 void setGroup() {
   serialCount = 0;
-  Serial1.println(groupString);
+  sprintf(groupString, "AT+DMOSETGROUP=%s,%s,%s,%s,%s,%s", TX_bw, TX_rxf, TX_txpl, TX_sq, TX_rxpl);
+  RADIO_SERIAL.println(groupString);
   delay(100);
-  Serial1.println(groupString);
-  while (Serial1.available() > 0) {
+  RADIO_SERIAL.println(groupString);
+
+  while (RADIO_SERIAL.available() > 0) {
     char incomingChar;
-    incomingChar = Serial1.read();
+    incomingChar = RADIO_SERIAL.read();
     groupReply[serialCount] = incomingChar;
     serialCount++;
   }
@@ -116,12 +121,14 @@ void setGroup() {
 
 void setVolume() {
   serialCount = 0;
-  Serial1.println(volumeString);
+  sprintf(volumeString, "AT+DMOSETVOLUME=%s", TX_vol);
+  
+  RADIO_SERIAL.println(volumeString);
   delay(100);
-  Serial1.println(volumeString);
-  while (Serial1.available() > 0) {
+  RADIO_SERIAL.println(volumeString);
+  while (RADIO_SERIAL.available() > 0) {
     char incomingChar;
-    incomingChar = Serial1.read();
+    incomingChar = RADIO_SERIAL.read();
     volumeReply[serialCount] = incomingChar;
     serialCount++;
   }
@@ -134,12 +141,14 @@ void setVolume() {
 
 void setFilter() {
   serialCount = 0;
-  Serial1.println(filterString);
+  sprintf(filterString, "AT+DMOSETFILTER=%s", TX_fil);
+  
+  RADIO_SERIAL.println(filterString);
   delay(100);
-  Serial1.println(filterString);
-  while (Serial1.available() > 0) {
+  RADIO_SERIAL.println(filterString);
+  while (RADIO_SERIAL.available() > 0) {
     char incomingChar;
-    incomingChar = Serial1.read();
+    incomingChar = RADIO_SERIAL.read();
     filterReply[serialCount] = incomingChar;
     serialCount++;
   }
@@ -149,11 +158,18 @@ void setFilter() {
 }
 
 
+//--------------TRANSMIT & stopTransmit-----------//
 
+void transmit() {
+  pinMode(TX_ptt, LOW);
+}
 
-//---------------------SETUP----------------------//
+void stopTransmit() {
+  pinMode(TX_ptt, HIGH);
+}
+//---------------------txSetup----------------------//
 
-void setup() {
+void txSetup() {
   pinMode(TX_pwr, OUTPUT);
   digitalWrite(TX_pwr, LOW);
   pinMode(TX_RXact, INPUT);
@@ -165,7 +181,7 @@ void setup() {
   //digitalWrite(error_pin, LOW);
 
   Serial.begin(115200);
-  Serial1.begin(9600);
+  RADIO_SERIAL.begin(9600);
 
   delay(1000);
   handShake();
@@ -180,6 +196,10 @@ void setup() {
     txDebug();
   }
 } 
+
+void setup(){
+  
+}
 
 void loop() {
   
