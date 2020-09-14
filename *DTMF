@@ -2,6 +2,7 @@
 //Add commands for telemetry & debug
 //Add command for TX interval
 //Add ability to change PIN and commands and store them in SRAM
+//build ACK and ERROR signals for DTMF commands (800Hz tone?)
 
 /* 
 PASS is a 4 digit PIN, each digit separated by a comma 
@@ -176,4 +177,3 @@ void loop() {
   }
   
 }
-
